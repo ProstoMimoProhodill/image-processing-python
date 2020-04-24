@@ -188,6 +188,19 @@ def improved_burnsen_algorithm(arg):
     integral_table = cv2.integral(np.array(img_halftone))[1:,1:]
     img_integral_table = Image.fromarray(integral_table.astype('uint8'), 'RGB')
     # result
+    min_sum = 10000000
+    max_sum = -1
+    for y in range(s,h-s,s):
+        for x in range(s,w-s,s):
+            sum = integral_table[y][x][0] + integral_table[y+s][x+s][0] - integral_table[y][x+s][0] - integral_table[y+s][x][0]
+            if sum < min_sum:
+                min_sum = sum
+            if sum > max_sum:
+                max_sum = sum
+
+    step = int((max_sum - min_sum) / 255)
+    # print("Step: ", step)
+
     sum = 0
     for y in range(s,h-s,s):
         for x in range(s,w-s,s):
@@ -195,9 +208,11 @@ def improved_burnsen_algorithm(arg):
             for j in range(y,y+s,1):
                 for i in range(x,x+s,1):
                     if sum==0:
-                        a = 1
+                        a = int(integral_table[j][i][0]) / step
                     else:
-                        a = int(((integral_table[j][i][0]/sum)))
+                        a = int(((integral_table[j][i][0]/sum))) / step
+                        # print("a: ", a)
+                        # input()
                     if a < t:
                         draw_res.point((i,j), (0,0,0))
                     else:
@@ -205,19 +220,19 @@ def improved_burnsen_algorithm(arg):
     img_res.save("./burnsen/" + img.filename)
 
 def main():
-    for file in glob.glob("*.bmp"):
+    for file in glob.glob("cell.bmp"):
         print("Select " + file)
         img = Image.open(file)
 
-        upsampling({'img': img, 'm': 2})
-        downsampling({'img': img, 'n': 2})
-        upsampling_and_downsampling({'img': img, 'm': 6,'n': 2})
-        oversampling({'img': img, 'k': 4})
+        # upsampling({'img': img, 'm': 2})
+        # downsampling({'img': img, 'n': 2})
+        # upsampling_and_downsampling({'img': img, 'm': 6,'n': 2})
+        # oversampling({'img': img, 'k': 4})
+        #
+        # halftone_averaging({'img': img})
+        # halftone_select_chanel({'img': img, 'chanel': 2})
 
-        halftone_averaging({'img': img})
-        halftone_select_chanel({'img': img, 'chanel': 2})
-
-        improved_burnsen_algorithm({'img': img, 's': 1, 't': 12500})
+        improved_burnsen_algorithm({'img': img, 's': 3, 't': 200})
 
 
 if __name__ == '__main__':

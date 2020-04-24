@@ -56,8 +56,25 @@ def contur(arg):
     def norm(A):
         step = ((A.max()-A.min())/255)
         if step == 0:
+            # return np.array([[255,255,255],[255,255,255],[255,255,255]])
             return np.absolute((A).astype(int))
         return np.absolute((A * (1/step)).astype(int))
+
+        # if A.max() < 0 or A.min() < 0:
+        #     for j in range(3):
+        #         for i in range(3):
+        #             # print(i,j)
+        #             if A[j][i] == A.min():
+        #                 A[j][i] = 0
+        #             elif A[j][i] == A.max():
+        #                 A[j][i] = 255
+        #             else:
+        #                 A[j][i] = 125
+        # else:
+        #     if A.max() != 0:
+        #         A = A * (255/A.max())
+        #     A = A.astype('int')
+        # return A
 
     for y in range(2,h,3):
         for x in range(2,w,3):
@@ -89,7 +106,7 @@ def contur(arg):
     img_res_bin_g.save("bin_g_" + img.filename)
 
 def main():
-    img = Image.open("2.bmp")
+    img = Image.open("3.png")
     contur({'img': img})
 
 if __name__ == '__main__':

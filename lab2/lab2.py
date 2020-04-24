@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageChops
 import numpy as np
 import time
 import os, glob
@@ -74,9 +74,7 @@ def xor(arg):
 
     for x in range(1,w-1):
         for y in range(1,h-1):
-            if img.getpixel((x,y))[0]==0 and img_filter.getpixel((x,y))[0]==0:
-                draw_res.point((x,y), (0,0,0))
-            elif img.getpixel((x,y))[0]==1 and img_filter.getpixel((x,y))[0]==1:
+            if img.getpixel((x,y))[0]==img_filter.getpixel((x,y))[0]:
                 draw_res.point((x,y), (0,0,0))
             else:
                 draw_res.point((x,y), (255,255,255))
@@ -84,7 +82,7 @@ def xor(arg):
     img_res.save("./xor/" + img.filename)
 
 def main():
-    for file in glob.glob("*.bmp"):
+    for file in glob.glob("2.bmp"):
         print("Select " + file)
         img = Image.open(file)
         # logic_filter({'img': img})
