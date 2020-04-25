@@ -20,15 +20,20 @@ def timer(f):
 def create_text_images(arg):
     text = str(arg.get('text'))
     font_size = int(arg.get('font_size'))
+    filename = str(arg.get('filename'))
+
+    if filename is None:
+        filename = text
+
     font = ImageFont.truetype("Times_New_Roman.ttf", font_size, encoding='UTF-8')
-    image = Image.new('L', (2000, 2000), (255))
+    image = Image.new('L', (5000, 5000), (255))
     draw = ImageDraw.Draw(image)
     codecs.decode(text.encode('UTF-8'), 'UTF-8')
     draw.text((10,-10), text, fill=0x000000, font=font, language="cyrl")
-    image.save("./{symbol}.bmp".format(symbol=text))
-    image = Image.open("./{symbol}.bmp".format(symbol=text)).convert('1')
-    image.save("./{symbol}.bmp".format(symbol=text))
-    image = Image.open("./{symbol}.bmp".format(symbol=text))
+    image.save("./{symbol}.bmp".format(symbol=filename))
+    image = Image.open("./{symbol}.bmp".format(symbol=filename)).convert('1')
+    image.save("./{symbol}.bmp".format(symbol=filename))
+    image = Image.open("./{symbol}.bmp".format(symbol=filename))
     w, h = image.size
     img_array = np.array(image).astype(int)
     min_w, max_w, min_h, max_h = w, -1, h, -1
@@ -45,7 +50,7 @@ def create_text_images(arg):
             if img_array[y][x].min() == 0 and x > max_w:
                 max_w = x
     crop = image.crop((min_w,min_h,max_w,max_h))
-    crop.save("./{symbol}.bmp".format(symbol=text))
+    crop.save("./{symbol}.bmp".format(symbol=filename))
 
 def create_profiles(arg):
     image_name = arg.get("image_name")
@@ -179,9 +184,9 @@ def measure_of_close(arg):
 
     image_name = arg.get('image_name')
     bounds = arg.get('bounds')
-    file = open('classifiction.txt', 'w')
+    file = open('classifiction_{name}.txt'.format(name=image_name), 'w')
     file.write("")
-    file = open('classifiction.txt', 'a')
+    file = open('classifiction_{name}.txt'.format(name=image_name), 'a')
     for i in range(len(bounds)):
         res = []
         img_profile_vert = Image.open("profiles_{name}_vert.png".format(name=image_name)).crop(bounds[i])
@@ -197,15 +202,26 @@ def measure_of_close(arg):
         print("{count}:{res}".format(count=i+1,res=res[0:3]))
     file.close()
 
-# def experiment(arg):
+def experiment(arg):
+    image_name = arg.get('image_name')
+    font_size = int(arg.get('font_size'))
 
+    create_text_images({'filename': "{name}_{size}".format(name=image_name, size=font_size), 'text': image_name, 'font_size': font_size})
+    create_profiles({'image_name': "{name}_{size}".format(name=image_name, size=font_size)})
+    segmentation({'image_name': "{name}_{size}".format(name=image_name, size=font_size)})
 
 @timer
 def main(arg):
-    create_text_images({'text': "mars", 'font_size': 52})
-    create_profiles({'image_name': "mars"})
-    segmentation({'image_name': "mars"})
-    # experiment({'image_name': "mars", 'font_size': 30})
+    # create_text_images({'filename': "mars_52", 'text': "mars", 'font_size': 52})
+    # create_profiles({'image_name': "mars"})
+    # segmentation({'image_name': "mars"})
+    # experiment({'image_name': "mars", 'font_size': 75})
+
+
+    create_text_images({'filename': "cat", 'text': "cat", 'font_size': 52})
+    create_profiles({'image_name': "cat"})
+    segmentation({'image_name': "cat"})
+    # experiment({'image_name': "alphabet", 'font_size': 75})
 
 if __name__ == '__main__':
     main({})
